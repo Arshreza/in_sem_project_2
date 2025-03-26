@@ -64,9 +64,9 @@ public:
             case TetrominoType::I: return LIGHT_BLUE;
             case TetrominoType::S: return LIGHT_RED;
             case TetrominoType::Z: return LIGHT_GREEN;
-            case TetrominoType::L: return YELLOW; // Orange not available, using yellow
-            case TetrominoType::J: return LIGHT_MAGENTA; // Pink
-            case TetrominoType::T: return MAGENTA; // Purple
+            case TetrominoType::L: return YELLOW; 
+            case TetrominoType::J: return LIGHT_MAGENTA; 
+            case TetrominoType::T: return MAGENTA; 
             default: return WHITE;
         }
     }
