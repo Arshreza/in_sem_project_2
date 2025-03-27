@@ -10,6 +10,11 @@ This is a console-based Tetris game written in C++ that features color support, 
 - Full game loop with game-over and restart functionality
 - User-friendly controls for movement, rotation, and dropping pieces
 
+## Screenshots
+![Screenshot 2025-03-27 120101.png](<https://media-hosting.imagekit.io/a56df843b9734e9a/Screenshot%202025-03-27%20120101.png?Expires=1837665960&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=qw~qB6VTbP6OCPDRyJrzwdkQCmWU5qXXLRqiKKKTa5KEmju2gpPo4QIKXczLyzWJtVjaqyK~tFPjHv1BTGFW~3NcQaBwUQA3UznKLNHUuuZc2hebauGd056sTnlIytiAIUPMz3pyR6rAdIUbgppn8GXgYXuhCGEgMEoAf9YS8HYbSX9XQRB5DmTS5xDPCOqmPLPQhrl8LNd~mzjwBwrnYemXDZ4U-N5a8gFWmtdSxTmJ1QSz44696WsDNnM3E1vuz9GSJKXugFerKE7kTwlVkZAb-BOIOh9dGvpd3k7frhx6vPXkLHCrNdGK57IUMtrX~TnGEiNjH8nSx7X246Vulg__>)
+
+![Screenshot 2025-03-27 120802.png](<https://media-hosting.imagekit.io/075d81fc7fa240e7/Screenshot%202025-03-27%20120802.png?Expires=1837666048&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=dgzxvQh~Zs8gSN6cW56F5C2F2WDRG8RjEQFG9iQQI2u519NwBz4j~kXoVVI8hH4zJF85RywY6XqnChulG-Ke9HUO4a~msK-A4bve3KdTfnYMoJAlFdv2Y3y7xHxvjprxcrLDk0vfXTTSeiSC-LbABt~MTDhbVqmshm~hVyI0qnLZBM5M4Dk8pTZFkr1Ala5~0Sw3XS1hmrOvsW8IwrbYj0ZyFYCNh~-0nscI0p92evx3Sgv1taf0lbiUd4QnAJUUQWBE99hW4mCIXlrLYa9HXRX4Oy2BuDxCFYGCn4MUPVq~qaAnHKhP2hb9amCXC2IRTXg1jXKc2-n9-tk7yjT-8w__>)  
+
 ## Controls
 - **A** - Move Left
 - **D** - Move Right
