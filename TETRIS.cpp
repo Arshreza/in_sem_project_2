@@ -1,14 +1,14 @@
-#include <iostream>  // Standard input/output stream
-#include <vector>    // Dynamic array container
-#include <cstdlib>   // General utilities including rand()
-#include <ctime>     // Time-related functions
-#include <chrono>    // Time utilities for game loop
-#include <thread>    // Sleep functionality
-#include <conio.h>   // Console input (kbhit, getch)
-#include <windows.h> // Windows API for console control
-#include <algorithm> // min/max functions
+#include <iostream> 
+#include <vector>    
+#include <cstdlib>   
+#include <ctime>    
+#include <chrono>    
+#include <thread>    
+#include <conio.h>   
+#include <windows.h> 
+#include <algorithm> 
 
-using namespace std; // Standard namespace
+using namespace std; 
 
 const int BOARD_WIDTH = 10;  // Width of game board in blocks
 const int BOARD_HEIGHT = 20; // Height of game board in blocks
