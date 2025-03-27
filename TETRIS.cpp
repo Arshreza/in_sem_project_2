@@ -1,24 +1,25 @@
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <chrono>
-#include <thread>
-#include <conio.h>
-#include <windows.h>
-#include <algorithm>
+#include <iostream>  // Standard input/output stream
+#include <vector>    // Dynamic array container
+#include <cstdlib>   // General utilities including rand()
+#include <ctime>     // Time-related functions
+#include <chrono>    // Time utilities for game loop
+#include <thread>    // Sleep functionality
+#include <conio.h>   // Console input (kbhit, getch)
+#include <windows.h> // Windows API for console control
+#include <algorithm> // min/max functions
 
-const int BOARD_WIDTH = 10;
-const int BOARD_HEIGHT = 20;
-const int BASE_SPEED = 1000;
-const int MIN_SPEED = 100;
-const int LEVEL_SCORE = 100;
-const int SPEED_DECREMENT = 100;
+using namespace std; // Standard namespace
 
-enum class TetrominoType { I, J, L, O, S, T, Z };
+const int BOARD_WIDTH = 10;  // Width of game board in blocks
+const int BOARD_HEIGHT = 20; // Height of game board in blocks
+const int BASE_SPEED = 1000; // Initial fall speed (ms)
+const int MIN_SPEED = 100;   // Minimum fall speed (ms)
+const int LEVEL_SCORE = 100; // Points needed per level
+const int SPEED_DECREMENT = 100; // Speed decrease per level
 
-// Color codes for Windows console
-enum ConsoleColor {
+enum class TetrominoType { I, J, L, O, S, T, Z }; // All tetromino types
+
+enum ConsoleColor { // Windows console color codes
     BLACK = 0,
     BLUE = 1,
     GREEN = 2,
@@ -39,26 +40,26 @@ enum ConsoleColor {
 
 class Tetromino {
 private:
-    TetrominoType type;
-    int x, y;
-    std::vector<std::vector<bool>> shape;
+    TetrominoType type; // Type of tetromino
+    int x, y;           // Position on board
+    vector<vector<bool>> shape; // Shape matrix
 
 public:
-    Tetromino() : x(0), y(0) {}
+    Tetromino() : x(0), y(0) {} // Default constructor
     
-    TetrominoType getType() const { return type; }
-    void setType(TetrominoType newType) { type = newType; }
+    TetrominoType getType() const { return type; } // Getter for type
+    void setType(TetrominoType newType) { type = newType; } // Setter for type
     
-    int getX() const { return x; }
-    void setX(int newX) { x = newX; }
+    int getX() const { return x; } // Get X position
+    void setX(int newX) { x = newX; } // Set X position
     
-    int getY() const { return y; }
-    void setY(int newY) { y = newY; }
+    int getY() const { return y; } // Get Y position
+    void setY(int newY) { y = newY; } // Set Y position
     
-    const std::vector<std::vector<bool>>& getShape() const { return shape; }
-    void setShape(const std::vector<std::vector<bool>>& newShape) { shape = newShape; }
+    const vector<vector<bool>>& getShape() const { return shape; } // Get shape
+    void setShape(const vector<vector<bool>>& newShape) { shape = newShape; } // Set shape
 
-    ConsoleColor getColor() const {
+    ConsoleColor getColor() const { // Get color based on type
         switch (type) {
             case TetrominoType::O: return YELLOW;
             case TetrominoType::I: return LIGHT_BLUE;
@@ -72,18 +73,18 @@ public:
     }
 };
 
-std::vector<std::vector<bool>> board(BOARD_HEIGHT, std::vector<bool>(BOARD_WIDTH, false));
-std::vector<std::vector<ConsoleColor>> boardColors(BOARD_HEIGHT, std::vector<ConsoleColor>(BOARD_WIDTH, BLACK));
-Tetromino currentPiece;
-int score = 0;
-int level = 1;
-bool gameOver = false;
+vector<vector<bool>> board(BOARD_HEIGHT, vector<bool>(BOARD_WIDTH, false)); // Game board (filled cells)
+vector<vector<ConsoleColor>> boardColors(BOARD_HEIGHT, vector<ConsoleColor>(BOARD_WIDTH, BLACK)); // Cell colors
+Tetromino currentPiece;  // Current falling piece
+int score = 0;           // Current score
+int level = 1;           // Current level
+bool gameOver = false;   // Game state flag
 
-void setColor(ConsoleColor color) {
+void setColor(ConsoleColor color) { // Set console text color
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-void hideCursor() {
+void hideCursor() { // Hide console cursor
     HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
@@ -91,7 +92,7 @@ void hideCursor() {
     SetConsoleCursorInfo(consoleHandle, &info);
 }
 
-void showCursor() {
+void showCursor() { // Show console cursor
     HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
@@ -99,10 +100,10 @@ void showCursor() {
     SetConsoleCursorInfo(consoleHandle, &info);
 }
 
-void initializeTetromino(Tetromino& tetromino) {
-    tetromino.setX(BOARD_WIDTH / 2 - 2);
-    tetromino.setY(0);
-    switch (tetromino.getType()) {
+void initializeTetromino(Tetromino& tetromino) { // Initialize piece shape/position
+    tetromino.setX(BOARD_WIDTH / 2 - 2); // Center horizontally
+    tetromino.setY(0); // Start at top
+    switch (tetromino.getType()) { // Set shape based on type
         case TetrominoType::I: tetromino.setShape({{true, true, true, true}}); break;
         case TetrominoType::J: tetromino.setShape({{true, false, false}, {true, true, true}}); break;
         case TetrominoType::L: tetromino.setShape({{false, false, true}, {true, true, true}}); break;
@@ -113,16 +114,16 @@ void initializeTetromino(Tetromino& tetromino) {
     }
 }
 
-TetrominoType getRandomTetrominoType() {
+TetrominoType getRandomTetrominoType() { // Get random piece type
     return static_cast<TetrominoType>(rand() % 7);
 }
 
-void spawnNewPiece() {
+void spawnNewPiece() { // Create new random piece
     currentPiece.setType(getRandomTetrominoType());
     initializeTetromino(currentPiece);
 }
 
-bool isCollision() {
+bool isCollision() { // Check for collisions
     const auto& shape = currentPiece.getShape();
     for (size_t y = 0; y < shape.size(); ++y) {
         for (size_t x = 0; x < shape[y].size(); ++x) {
@@ -139,7 +140,7 @@ bool isCollision() {
     return false;
 }
 
-void mergePieceToBoard() {
+void mergePieceToBoard() { // Lock piece into board
     const auto& shape = currentPiece.getShape();
     ConsoleColor color = currentPiece.getColor();
     for (size_t y = 0; y < shape.size(); ++y) {
@@ -152,7 +153,7 @@ void mergePieceToBoard() {
     }
 }
 
-void clearLines() {
+void clearLines() { // Check and clear completed lines
     int linesCleared = 0;
     for (int y = BOARD_HEIGHT - 1; y >= 0; --y) {
         bool lineFull = true;
@@ -168,13 +169,13 @@ void clearLines() {
                 board[yy] = board[yy - 1];
                 boardColors[yy] = boardColors[yy - 1];
             }
-            board[0] = std::vector<bool>(BOARD_WIDTH, false);
-            boardColors[0] = std::vector<ConsoleColor>(BOARD_WIDTH, BLACK);
+            board[0] = vector<bool>(BOARD_WIDTH, false);
+            boardColors[0] = vector<ConsoleColor>(BOARD_WIDTH, BLACK);
             ++y;
         }
     }
     
-    if (linesCleared > 0) {
+    if (linesCleared > 0) { // Update score
         int points = 0;
         switch (linesCleared) {
             case 1: points = 100; break;
@@ -184,44 +185,44 @@ void clearLines() {
         }
         score += points;
         
-        int newLevel = score / LEVEL_SCORE + 1;
+        int newLevel = score / LEVEL_SCORE + 1; // Check level up
         if (newLevel > level) {
             level = newLevel;
             system("cls");
             setColor(LIGHT_YELLOW);
-            std::cout << "\n\n      LEVEL UP!\n";
-            std::cout << "    Now at level " << level << "!\n";
-            std::cout << "    Speed increased!\n";
+            cout << "\n\n      LEVEL UP!\n";
+            cout << "    Now at level " << level << "!\n";
+            cout << "    Speed increased!\n";
             Sleep(800);
             setColor(WHITE);
         }
     }
 }
 
-void rotatePiece() {
+void rotatePiece() { // Rotate current piece
     const auto& originalShape = currentPiece.getShape();
-    std::vector<std::vector<bool>> rotated(originalShape[0].size(), 
-                                    std::vector<bool>(originalShape.size()));
+    vector<vector<bool>> rotated(originalShape[0].size(), 
+                                    vector<bool>(originalShape.size()));
     for (size_t y = 0; y < originalShape.size(); ++y) {
         for (size_t x = 0; x < originalShape[y].size(); ++x) {
             rotated[x][originalShape.size() - 1 - y] = originalShape[y][x];
         }
     }
     currentPiece.setShape(rotated);
-    if (isCollision()) {
+    if (isCollision()) { // Revert if collision
         currentPiece.setShape(originalShape);
     }
 }
 
-void drawBoard() {
+void drawBoard() { // Render game state
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD coord = {0, 0};
     SetConsoleCursorPosition(hConsole, coord);
     
     setColor(WHITE);
-    std::cout << "Score: " << score << "   Level: " << level << "   Speed: " 
-              << std::max(MIN_SPEED, BASE_SPEED - (level-1)*SPEED_DECREMENT) << "ms\n";
-    std::cout << "Next Level in: " << LEVEL_SCORE - (score % LEVEL_SCORE) << " points\n";
+    cout << "Score: " << score << "   Level: " << level << "   Speed: " 
+              << max(MIN_SPEED, BASE_SPEED - (level-1)*SPEED_DECREMENT) << "ms\n";
+    cout << "Next Level in: " << LEVEL_SCORE - (score % LEVEL_SCORE) << " points\n";
     
     const auto& currentShape = currentPiece.getShape();
     ConsoleColor currentColor = currentPiece.getColor();
@@ -240,45 +241,45 @@ void drawBoard() {
             
             if (isCurrent) {
                 setColor(currentColor);
-                std::cout << "[]";
+                cout << "[]";
             } else if (board[y][x]) {
                 setColor(boardColors[y][x]);
-                std::cout << "##";
+                cout << "##";
             } else {
                 setColor(BLACK);
-                std::cout << "  ";
+                cout << "  ";
             }
         }
         setColor(WHITE);
-        std::cout << "\n";
+        cout << "\n";
     }
     setColor(WHITE);
-    std::cout << std::string(BOARD_WIDTH * 2, '-') << "\n";
-    std::cout << "Controls: [A]Left [D]Right [W]Rotate [S]Drop [Space]Hard Drop\n";
-    std::cout << "          [R]Restart [Q]Quit\n";
+    cout << string(BOARD_WIDTH * 2, '-') << "\n";
+    cout << "Controls: [A]Left [D]Right [W]Rotate [S]Drop [Space]Hard Drop\n";
+    cout << "          [R]Restart [Q]Quit\n";
 }
 
-void resetGame() {
+void resetGame() { // Reset game state
     system("cls");
-    board = std::vector<std::vector<bool>>(BOARD_HEIGHT, std::vector<bool>(BOARD_WIDTH, false));
-    boardColors = std::vector<std::vector<ConsoleColor>>(BOARD_HEIGHT, std::vector<ConsoleColor>(BOARD_WIDTH, BLACK));
+    board = vector<vector<bool>>(BOARD_HEIGHT, vector<bool>(BOARD_WIDTH, false));
+    boardColors = vector<vector<ConsoleColor>>(BOARD_HEIGHT, vector<ConsoleColor>(BOARD_WIDTH, BLACK));
     score = 0;
     level = 1;
     gameOver = false;
     spawnNewPiece();
 }
 
-void gameLoop() {
+void gameLoop() { // Main game loop
     hideCursor();
     resetGame();
     
-    auto lastFallTime = std::chrono::steady_clock::now();
+    auto lastFallTime = chrono::steady_clock::now();
     while (!gameOver) {
-        int currentSpeed = std::max(MIN_SPEED, BASE_SPEED - (level-1)*SPEED_DECREMENT);
+        int currentSpeed = max(MIN_SPEED, BASE_SPEED - (level-1)*SPEED_DECREMENT);
         
         drawBoard();
         
-        if (_kbhit()) {
+        if (_kbhit()) { // Handle input
             char key = _getch();
             switch (tolower(key)) {
                 case 'a': 
@@ -313,8 +314,8 @@ void gameLoop() {
             }
         }
         
-        auto currentTime = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastFallTime).count() > currentSpeed) {
+        auto currentTime = chrono::steady_clock::now(); // Automatic falling
+        if (chrono::duration_cast<chrono::milliseconds>(currentTime - lastFallTime).count() > currentSpeed) {
             currentPiece.setY(currentPiece.getY() + 1);
             if (isCollision()) {
                 currentPiece.setY(currentPiece.getY() - 1);
@@ -325,27 +326,27 @@ void gameLoop() {
             }
             lastFallTime = currentTime;
         }
-        Sleep(30);
+        Sleep(30); // Small delay to reduce CPU usage
     }
     
     showCursor();
     system("cls");
     setColor(LIGHT_RED);
-    std::cout << "\n\n  GAME OVER!\n";
+    cout << "\n\n  GAME OVER!\n";
     setColor(WHITE);
-    std::cout << "  Final Score: " << score << "\n";
-    std::cout << "  Final Level: " << level << "\n";
-    std::cout << "  Speed Reached: " << std::max(MIN_SPEED, BASE_SPEED - (level-1)*SPEED_DECREMENT) << "ms\n\n";
-    std::cout << "  Press R to restart or any other key to quit\n";
+    cout << "  Final Score: " << score << "\n";
+    cout << "  Final Level: " << level << "\n";
+    cout << "  Speed Reached: " << max(MIN_SPEED, BASE_SPEED - (level-1)*SPEED_DECREMENT) << "ms\n\n";
+    cout << "  Press R to restart or any other key to quit\n";
     
-    if (_getch() == 'r' || _getch() == 'R') {
+    if (_getch() == 'r' || _getch() == 'R') { // Restart check
         gameLoop();
     }
 }
 
-int main() {
-    srand(static_cast<unsigned>(time(nullptr)));
-    gameLoop();
-    showCursor();
+int main() { // Entry point
+    srand(static_cast<unsigned>(time(nullptr))); // Seed random generator
+    gameLoop(); // Start game
+    showCursor(); // Ensure cursor is visible on exit
     return 0;
 }
